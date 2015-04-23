@@ -252,7 +252,7 @@
         title: 'title',
         trigger: 'hover',
         follow: false,
-        hoverStay: true
+        hoverStay: false,
     };
 
     // Overwrite this method to provide options on a per-element basis.
