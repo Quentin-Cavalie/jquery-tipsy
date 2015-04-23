@@ -21,7 +21,7 @@
     function fixTitle($ele) {
         if ($ele.attr('title') || typeof($ele.attr('original-title')) != 'string') {
             var $title = $e.attr('title');
-            $e.removeAttr('title').attr('title','').attr('original-title', $title || '');
+            $ele.removeAttr('title').attr('title','').attr('original-title', $title || '');
         }
     }
 
