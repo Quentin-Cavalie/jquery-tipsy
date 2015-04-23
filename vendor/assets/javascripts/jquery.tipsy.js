@@ -20,8 +20,8 @@
 
     function fixTitle($ele) {
         if ($ele.attr('title') || typeof($ele.attr('original-title')) != 'string') {
-            $ele.attr('original-title', $ele.attr('title') || '').removeAttr('title');
-        }
+            var $title = $e.attr('title');
+            $e.removeAttr('title').attr('title','').attr('original-title', $title || '');
     }
 
     function Tipsy(element, options) {
@@ -36,6 +36,7 @@
             var title = this.getTitle();
             if (title && this.enabled) {
                 var $tip = this.tip();
+                var $link = this;
 
                 $tip.find('.tipsy-inner')[this.options.html ? 'html' : 'text'](title);
                 $tip[0].className = 'tipsy'; // reset classname in case of dynamic gravity
@@ -91,6 +92,11 @@
                 } else {
                     $tip.css({visibility: 'visible', opacity: this.options.opacity});
                 }
+
+                if (this.options.hoverStay) {               
+                    $tip.find('.tipsy-inner').bind('mouseover',function(){$link.enter($link)});
+                    $tip.find('.tipsy-inner').bind('mouseout',function(){$link.leave($link)});  
+                }
             }
         },
 
@@ -99,6 +105,30 @@
                 this.tip().stop().fadeOut(function() { $(this).remove(); });
             } else {
                 this.tip().remove();
+            }
+        },
+
+        enter: function() {
+            $tip = this;
+            this.hoverState = 'in';
+            if(!$tip.tip().is(":visible")){         
+                if ($tip.options.delayIn == 0) {
+                    $tip.show();
+                } else {
+                    setTimeout(function() { if ($tip.hoverState == 'in') $tip.show(); }, $tip.options.delayIn);
+                }
+            }
+        },
+        
+        leave: function() {
+            $tip = this;
+            this.hoverState = 'out';
+            if($tip.tip().is(":visible")){
+                if (this.options.delayOut == 0) {
+                    $tip.hide();
+                } else {
+                    setTimeout(function() {if ($tip.hoverState == 'out') $tip.hide(); }, $tip.options.delayOut);
+                }
             }
         },
 
@@ -178,7 +208,7 @@
                             $(tipsy.$tip).css('left', x);
                         } else if (options.follow == 'y') {
                             if (/^w|^e/.test(options.gravity) ) {
-                                $(tipsy.$tip).css('top', event.pageY-($(tipsy.$tip).outerHeight()/2));
+                                $(tipsy.$tip).css('top', event.pageY - ($(tipsy.$tip[0]).offsetHeight));
                             }
                         }
 
@@ -221,7 +251,8 @@
         opacity: 0.8,
         title: 'title',
         trigger: 'hover',
-                follow: false,
+        follow: false,
+        hoverStay: true
     };
 
     // Overwrite this method to provide options on a per-element basis.
