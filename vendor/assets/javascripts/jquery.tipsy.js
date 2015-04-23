@@ -63,28 +63,28 @@
                 var tp;
                 switch (gravity.charAt(0)) {
                     case 'n':
-                        tp = {top: pos.top  pos.height  this.options.offset, left: pos.left  pos.width / 2 - actualWidth / 2};
+                        tp = {top: pos.top + pos.height + this.options.offset, left: pos.left + pos.width / 2 - actualWidth / 2};
                         break;
                     case 's':
-                        tp = {top: pos.top - actualHeight - this.options.offset, left: pos.left  pos.width / 2 - actualWidth / 2};
+                        tp = {top: pos.top - actualHeight - this.options.offset, left: pos.left + pos.width / 2 - actualWidth / 2};
                         break;
                     case 'e':
-                        tp = {top: pos.top  pos.height / 2 - actualHeight / 2, left: pos.left - actualWidth - this.options.offset};
+                        tp = {top: pos.top + pos.height / 2 - actualHeight / 2, left: pos.left - actualWidth - this.options.offset};
                         break;
                     case 'w':
-                        tp = {top: pos.top  pos.height / 2 - actualHeight / 2, left: pos.left  pos.width  this.options.offset};
+                        tp = {top: pos.top + pos.height / 2 - actualHeight / 2, left: pos.left + pos.width + this.options.offset};
                         break;
                 }
 
                 if (gravity.length == 2) {
                     if (gravity.charAt(1) == 'w') {
-                        tp.left = pos.left  pos.width / 2 - 15;
+                        tp.left = pos.left + pos.width / 2 - 15;
                     } else {
-                        tp.left = pos.left  pos.width / 2 - actualWidth  15;
+                        tp.left = pos.left + pos.width / 2 - actualWidth + 15;
                     }
                 }
 
-                $tip.css(tp).addClass('tipsy-'  gravity);
+                $tip.css(tp).addClass('tipsy-' + gravity);
 
                 if (this.options.fade) {
                     $tip.stop().css({opacity: 0, display: 'block', visibility: 'visible'}).animate({opacity: this.options.opacity});
@@ -110,7 +110,7 @@
             } else if (typeof o.title == 'function') {
                 title = o.title.call($e[0]);
             }
-            title = (''  title).replace(/(^\s*|\s*$)/, "");
+            title = ('' + title).replace(/(^\s*|\s*$)/, "");
             return title || o.fallback;
         },
 
@@ -233,11 +233,11 @@
     };
 
     $.fn.tipsy.autoNS = function() {
-        return $(this).offset().top > ($(document).scrollTop()  $(window).height() / 2) ? 's' : 'n';
+        return $(this).offset().top > ($(document).scrollTop() + $(window).height() / 2) ? 's' : 'n';
     };
 
     $.fn.tipsy.autoWE = function() {
-        return $(this).offset().left > ($(document).scrollLeft()  $(window).width() / 2) ? 'e' : 'w';
+        return $(this).offset().left > ($(document).scrollLeft() + $(window).width() / 2) ? 'e' : 'w';
     };
 
     $.fn.tipsy.autoBounds = function(margin, prefer) {
