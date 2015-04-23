@@ -13,7 +13,7 @@
       ele = ele.parentNode;
       while (ele) {
         if (ele == document) return true;
-          else ele = ele.parentNode;
+        else ele = ele.parentNode;
        }
       return false;
     }
@@ -22,6 +22,7 @@
         if ($ele.attr('title') || typeof($ele.attr('original-title')) != 'string') {
             var $title = $e.attr('title');
             $e.removeAttr('title').attr('title','').attr('original-title', $title || '');
+        }
     }
 
     function Tipsy(element, options) {
