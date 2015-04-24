@@ -13,23 +13,16 @@
       ele = ele.parentNode;
       while (ele) {
         if (ele == document) return true;
-        else ele = ele.parentNode;
+        // else ele = ele.parentNode;
        }
       return false;
-    }
-
-    function fixTitle($ele) {
-        if ($ele.attr('title') || typeof($ele.attr('original-title')) != 'string') {
-            var $title = $ele.attr('title');
-            $ele.removeAttr('title').attr('title','').attr('original-title', $title || '');
-        }
     }
 
     function Tipsy(element, options) {
         this.$element = $(element);
         this.options = options;
         this.enabled = true;
-        fixTitle(this.$element);
+        fixTitle();
     }
 
     Tipsy.prototype = {
@@ -41,7 +34,7 @@
 
                 $tip.find('.tipsy-inner')[this.options.html ? 'html' : 'text'](title);
                 $tip[0].className = 'tipsy'; // reset classname in case of dynamic gravity
-                $tip.remove().css({top: 0, left: 0, visibility: 'hidden', display: 'block'}).appendTo(document.body);
+                $tip.remove().css({top: 0, left: 0, visibility: 'hidden', display: 'block'}).prependTo(document.body);
 
                 var pos;
                 try {
@@ -58,9 +51,7 @@
                 }
 
                 var actualWidth = $tip[0].offsetWidth, actualHeight = $tip[0].offsetHeight;
-                var gravity = (typeof this.options.gravity == 'function')
-                                ? this.options.gravity.call(this.$element[0])
-                                : this.options.gravity;
+                var gravity = maybeCall(this.options.gravity, this.$element[0]);
 
                 var tp;
                 switch (gravity.charAt(0)) {
@@ -87,6 +78,9 @@
                 }
 
                 $tip.css(tp).addClass('tipsy-' + gravity);
+
+                if (this.options.className) {
+                    $tip.addClass(maybeCall(this.options.className, this.$element[0]));
 
                 if (this.options.fade) {
                     $tip.stop().css({opacity: 0, display: 'block', visibility: 'visible'}).animate({opacity: this.options.opacity});
@@ -133,9 +127,17 @@
             }
         },
 
+        function fixTitle() {
+            var $e = this.$element
+            if ($e.attr('title') || typeof($e.attr('original-title')) != 'string') {
+                var $title = $e.attr('title');
+                $e.removeAttr('title').attr('title','').attr('original-title', $title || '');
+            }
+        },
+
         getTitle: function() {
             var title, $e = this.$element, o = this.options;
-            fixTitle($e);
+            this.fixTitle();
             if (typeof o.title == 'string') {
                 title = $e.attr(o.title == 'title' ? 'original-title' : o.title);
             } else if (typeof o.title == 'function') {
@@ -148,6 +150,7 @@
         tip: function() {
             if (!this.$tip) {
                 this.$tip = $('<div class="tipsy"></div>').html('<div class="tipsy-arrow"></div><div class="tipsy-inner"/></div>');
+                this.$tip.data('tipsy-pointee', this.$element[0]);
             }
             return this.$tip;
         },
@@ -170,7 +173,9 @@
         if (options === true) {
             return this.data('tipsy');
         } else if (typeof options == 'string') {
-            return this.data('tipsy')[options]();
+            var tipsy = this.data('tipsy');
+            if (tipsy) tipsy[options]();
+            return this;
         }
 
         options = $.extend({}, $.fn.tipsy.defaults, options);
@@ -190,30 +195,10 @@
             if (options.delayIn === 0) {
                 tipsy.show();
             } else {
+                tipsy.fixTitle();
                 setTimeout(function() { if (tipsy.hoverState == 'in') tipsy.show(); }, options.delayIn);
             }
         }
-
-                function move(event) {
-                        var tipsy = get(this);
-                        tipsy.hoverState = 'in';
-                        if (options.follow == 'x') {
-                            var arrow = $(tipsy.$tip).children('.tipsy-arrow');
-                            if (/^[^w]w$/.test(options.gravity) && arrow.position() != null) {
-                                var x = event.pageX - ($(arrow).position().left($(arrow).outerWidth()/2));
-                            } else if (/^[^e]e$/.test(options.gravity) && arrow.position() != null) {
-                                var x = event.pageX - ($(arrow).position().left($(arrow).outerWidth()/2));
-                            } else {
-                                var x = event.pageX - ($(tipsy.$tip).outerWidth()/2);
-                            }
-                            $(tipsy.$tip).css('left', x);
-                        } else if (options.follow == 'y') {
-                            if (/^w|^e/.test(options.gravity) ) {
-                                $(tipsy.$tip).css('top', event.pageY - ($(tipsy.$tip[0]).offsetHeight));
-                            }
-                        }
-
-                }
 
         function leave() {
             var tipsy = get(this);
@@ -222,6 +207,26 @@
                 tipsy.hide();
             } else {
                 setTimeout(function() { if (tipsy.hoverState == 'out') tipsy.hide(); }, options.delayOut);
+            }
+        }
+
+        function move(event) {
+            var tipsy = get(this);
+            tipsy.hoverState = 'in';
+            if (options.follow == 'x') {
+                var arrow = $(tipsy.$tip).children('.tipsy-arrow');
+                if (/^[^w]w$/.test(options.gravity) && arrow.position() != null) {
+                    var x = event.pageX - ($(arrow).position().left($(arrow).outerWidth()/2));
+                } else if (/^[^e]e$/.test(options.gravity) && arrow.position() != null) {
+                    var x = event.pageX - ($(arrow).position().left($(arrow).outerWidth()/2));
+                } else {
+                    var x = event.pageX - ($(tipsy.$tip).outerWidth()/2);
+                }
+                $(tipsy.$tip).css('left', x);
+            } else if (options.follow == 'y') {
+                if (/^w|^e/.test(options.gravity) ) {
+                    $(tipsy.$tip).css('top', event.pageY - ($(tipsy.$tip[0]).offsetHeight));
+                }
             }
         };
 
@@ -232,7 +237,7 @@
                 eventIn  = options.trigger == 'hover' ? 'mouseenter' : 'focus',
                 eventOut = options.trigger == 'hover' ? 'mouseleave' : 'blur',
                                 eventMove = 'mousemove';
-            this[binder](eventIn, enter)[binder](eventOut, leave)[binder](eventMove, move);
+            this[binder](eventIn, enter)[binder](eventOut, leave)[binder](eventOut, move);
 
         }
 
@@ -253,8 +258,18 @@
         title: 'title',
         trigger: 'hover',
         follow: false,
-        hoverStay: false,
+        hoverStay: false
     };
+
+    $.fn.tipsy.revalidate = function() {
+      $('.tipsy').each(function() {
+        var pointee = $.data(this, 'tipsy-pointee');
+        if (!pointee || !isElementInDOM(pointee)) {
+          $(this).remove();
+        }
+      });
+    };
+
 
     // Overwrite this method to provide options on a per-element basis.
     // For example, you could store the gravity in a 'tipsy-gravity' attribute:
