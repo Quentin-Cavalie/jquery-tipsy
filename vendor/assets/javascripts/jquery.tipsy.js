@@ -22,7 +22,7 @@
         this.$element = $(element);
         this.options = options;
         this.enabled = true;
-        fixTitle();
+        this.fixTitle();
     };
 
     Tipsy.prototype = {
