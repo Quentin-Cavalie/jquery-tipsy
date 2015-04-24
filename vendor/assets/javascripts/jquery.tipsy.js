@@ -13,7 +13,6 @@
       ele = ele.parentNode;
       while (ele) {
         if (ele == document) return true;
-        // else ele = ele.parentNode;
        }
       return false;
     };
@@ -222,8 +221,10 @@
                     var x = event.pageX - ($(arrow).position().left($(arrow).outerWidth()/2));
                 } else {
                     var x = event.pageX - ($(tipsy.$tip).outerWidth()/2);
+                    var y = this.$element[0].getBBox().height
                 }
                 $(tipsy.$tip).css('left', x);
+                $(tipsy.$tip).css('top', y);
             } else if (options.follow == 'y') {
                 if (/^w|^e/.test(options.gravity) ) {
                     $(tipsy.$tip).css('top', event.pageY - ($(tipsy.$tip[0]).offsetHeight));
