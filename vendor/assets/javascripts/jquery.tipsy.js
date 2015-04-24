@@ -7,7 +7,7 @@
 
     function maybeCall(thing, ctx) {
         return (typeof thing == 'function') ? (thing.call(ctx)) : thing;
-    }
+    };
     
     function isElementInDOM(ele) {
       ele = ele.parentNode;
@@ -16,14 +16,14 @@
         // else ele = ele.parentNode;
        }
       return false;
-    }
+    };
 
     function Tipsy(element, options) {
         this.$element = $(element);
         this.options = options;
         this.enabled = true;
         fixTitle();
-    }
+    };
 
     Tipsy.prototype = {
         show: function() {
@@ -81,6 +81,7 @@
 
                 if (this.options.className) {
                     $tip.addClass(maybeCall(this.options.className, this.$element[0]));
+                }
 
                 if (this.options.fade) {
                     $tip.stop().css({opacity: 0, display: 'block', visibility: 'visible'}).animate({opacity: this.options.opacity});
@@ -127,7 +128,7 @@
             }
         },
 
-        function fixTitle() {
+        fixTitle: function() {
             var $e = this.$element
             if ($e.attr('title') || typeof($e.attr('original-title')) != 'string') {
                 var $title = $e.attr('title');
