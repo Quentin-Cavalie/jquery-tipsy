@@ -238,7 +238,7 @@
                 eventIn  = options.trigger == 'hover' ? 'mouseenter' : 'focus',
                 eventOut = options.trigger == 'hover' ? 'mouseleave' : 'blur',
                                 eventMove = 'mousemove';
-            this[binder](eventIn, enter)[binder](eventOut, leave)[binder](eventOut, move);
+            this[binder](eventIn, enter)[binder](eventOut, leave)[binder](eventMove, move);
 
         }
 
